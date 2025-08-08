@@ -1,7 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 
 
 // Initializing the app
@@ -29,6 +29,12 @@ async function run() {
     const database = client.db('tourifyDB');
     const touristSpotCollection = database.collection('touristSpots');
 
+    app.get('/tourist-spot/:id', async (req, res) => {
+      const { id } = req.params;
+      const query = { _id: new ObjectId(id) };
+      const touristSpot = await touristSpotCollection.findOne(query);
+      res.send(touristSpot);
+    });
     app.get('/all-tourist-spots', async (req, res) => {
       const allTouristSpots = await touristSpotCollection.find().toArray();
       res.send(allTouristSpots);
