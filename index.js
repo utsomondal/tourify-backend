@@ -33,6 +33,10 @@ async function run() {
       const allTouristSpots = await touristSpotCollection.find().toArray();
       res.send(allTouristSpots);
     });
+    app.get('/all-tourist-spots/top', async (req, res) => {
+      const allTouristSpots = await touristSpotCollection.find().sort({ totalVisitorsPerYear: -1 }).limit(6).toArray();
+      res.send(allTouristSpots);
+    });
 
     app.post("/add-tourist-spot", async (req, res) => {
       const touristSpotData = req.body;
