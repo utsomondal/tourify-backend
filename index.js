@@ -12,11 +12,6 @@ const port = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-// Test route
-app.get('/', (req, res) => {
-  res.send('Tourify backend is working ✅');
-});
-
 // connect mongodb
 const uri = `mongodb+srv://${process.env.MONGODB_USERNAME}:${process.env.MONGODB_PASS}@learning-cluster.4pttlh7.mongodb.net/?retryWrites=true&w=majority&appName=${process.env.MONGODB_CLUSTER}`;
 
@@ -33,6 +28,11 @@ async function run() {
     await client.connect();
     const database = client.db('tourifyDB');
     const touristSpotCollection = database.collection('touristSpots');
+
+    app.get('/all-tourist-spots', async (req, res) => {
+      const allTouristSpots = await touristSpotCollection.find().toArray();
+      res.send(allTouristSpots);
+    });
 
     app.post("/add-tourist-spot", async (req, res) => {
       const touristSpotData = req.body;
