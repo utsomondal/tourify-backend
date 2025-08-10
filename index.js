@@ -29,6 +29,12 @@ async function run() {
     const database = client.db('tourifyDB');
     const touristSpotCollection = database.collection('touristSpots');
 
+    app.post('/my-spots', async (req, res) => {
+      const { email } = req.body;
+      const query = { userEmail: email };
+      const touristSpot = await touristSpotCollection.find(query).toArray();
+      res.send(touristSpot);
+    });
     app.get('/tourist-spot/:id', async (req, res) => {
       const { id } = req.params;
       const query = { _id: new ObjectId(id) };
