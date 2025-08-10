@@ -35,16 +35,19 @@ async function run() {
       const touristSpot = await touristSpotCollection.find(query).toArray();
       res.send(touristSpot);
     });
+
     app.get('/tourist-spot/:id', async (req, res) => {
       const { id } = req.params;
       const query = { _id: new ObjectId(id) };
       const touristSpot = await touristSpotCollection.findOne(query);
       res.send(touristSpot);
     });
+
     app.get('/all-tourist-spots', async (req, res) => {
       const allTouristSpots = await touristSpotCollection.find().toArray();
       res.send(allTouristSpots);
     });
+
     app.get('/all-tourist-spots/top', async (req, res) => {
       const allTouristSpots = await touristSpotCollection.find().sort({ totalVisitorsPerYear: -1 }).limit(6).toArray();
       res.send(allTouristSpots);
@@ -54,7 +57,33 @@ async function run() {
       const touristSpotData = req.body;
       const result = await touristSpotCollection.insertOne(touristSpotData);
       res.send(result);
-    })
+    });
+
+    app.delete("/my-spots/:id", async (req, res) => {
+      const { id } = req.params;
+      const query = { _id: new ObjectId(id) };
+      const deleteSpot = await touristSpotCollection.deleteOne(query);
+      res.send(deleteSpot);
+    });
+
+    app.put('/update-tourist-spot/:id', async (req, res) => {
+      const { id } = req.params;
+      const data = req.body;
+
+      if ('_id' in data) {
+        delete data._id;
+      }
+
+      const query = { _id: new ObjectId(id) };
+      const updateDoc = {
+        $set: data,
+      };
+
+      const options = { upsert: true };
+
+      const result = await touristSpotCollection.updateOne(query, updateDoc, options);
+      res.send(result);
+    });
 
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
