@@ -68,10 +68,6 @@ async function run() {
       await countriesCollection.insertMany(countries);
     }
 
-    app.get('/', (req, res) => {
-      res.send('Tourify server is running');
-    });
-
     app.get('/countries', async (req, res) => {
       const allCountries = await countriesCollection.find().toArray();
       res.send(allCountries);
@@ -148,3 +144,11 @@ async function run() {
   }
 }
 run().catch(console.dir);
+
+app.get('/', (req, res) => {
+    res.send('Tourify server is running')
+})
+
+app.listen(port, () => {
+    console.log(`Tourify Server is running on port: ${port}`)
+})
