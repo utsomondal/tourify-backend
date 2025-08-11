@@ -36,6 +36,13 @@ async function run() {
       res.send(touristSpot);
     });
 
+    app.post('/spots-by-country', async (req, res) => {
+      const { countryName } = req.body;
+      const query = { countryName };
+      const touristSpot = await touristSpotCollection.find(query).toArray();
+      res.send(touristSpot);
+    });
+
     app.get('/tourist-spot/:id', async (req, res) => {
       const { id } = req.params;
       const query = { _id: new ObjectId(id) };
