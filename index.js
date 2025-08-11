@@ -68,6 +68,10 @@ async function run() {
       await countriesCollection.insertMany(countries);
     }
 
+    app.get('/', (req, res) => {
+      res.send('Tourify server is running');
+    });
+
     app.get('/countries', async (req, res) => {
       const allCountries = await countriesCollection.find().toArray();
       res.send(allCountries);
