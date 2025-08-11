@@ -3,7 +3,6 @@ const express = require('express');
 const cors = require('cors');
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 
-
 // Initializing the app
 const app = express();
 const port = process.env.PORT || 3000;
@@ -12,7 +11,7 @@ const port = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-// connect mongodb
+// Connect mongodb
 const uri = `mongodb+srv://${process.env.MONGODB_USERNAME}:${process.env.MONGODB_PASS}@learning-cluster.4pttlh7.mongodb.net/?retryWrites=true&w=majority&appName=${process.env.MONGODB_CLUSTER}`;
 
 const client = new MongoClient(uri, {
@@ -23,11 +22,56 @@ const client = new MongoClient(uri, {
   }
 });
 
+// Country data
+const countries = [
+  {
+    "country_Name": "France",
+    "imageURL": "https://frenchmoments.eu/wp-content/uploads/2013/10/Paris-%C2%A9-French-Moments-Tour-Eiffel-Structure-01.jpg",
+    "description": "France is famous for its rich history, art, cuisine, and the iconic Eiffel Tower."
+  },
+  {
+    "country_Name": "Italy",
+    "imageURL": "https://cdn.britannica.com/36/162636-050-932C5D49/Colosseum-Rome-Italy.jpg",
+    "description": "Italy offers stunning architecture, delicious food, and ancient ruins like the Colosseum."
+  },
+  {
+    "country_Name": "Spain",
+    "imageURL": "https://www.cuddlynest.com/blog/wp-content/uploads/2020/09/sagrada-familia-most-beautiful-buildings-world-1030x713.jpg",
+    "description": "Spain is known for vibrant festivals, beautiful beaches, and historic cities like Barcelona."
+  },
+  {
+    "country_Name": "England",
+    "imageURL": "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/0d/63/f8/bb/big-ben.jpg?w=900&h=500&s=1&pcx=1033&pcy=310&pchk=v1_bf93e1170e1f1f8d4cea",
+    "description": "England boasts famous landmarks like Big Ben, Buckingham Palace, and a rich literary history."
+  },
+  {
+    "country_Name": "Switzerland",
+    "imageURL": "https://images.ctfassets.net/m5us57n7qfgl/7f8rGhMALJTU39GoyBXSEo/e1a7ed9ceec7f633459df2e34d6a8f67/image-1.jpg?w=1200&h=630&fm=jpg&q=70&f=center",
+    "description": "Switzerland is famous for its breathtaking Alps, chocolates, and luxury watches."
+  },
+  {
+    "country_Name": "Netherlands",
+    "imageURL": "https://static.vecteezy.com/system/resources/previews/032/492/435/large_2x/colorful-tulips-and-windmill-in-holland-spring-landscape-landscape-with-tulips-in-zaanse-schans-netherlands-europe-ai-generated-free-photo.jpg",
+    "description": "The Netherlands is known for its windmills, tulip fields, canals, and vibrant cities like Amsterdam."
+  }
+]
+
+
 async function run() {
   try {
     await client.connect();
     const database = client.db('tourifyDB');
     const touristSpotCollection = database.collection('touristSpots');
+    const countriesCollection = database.collection('countries');
+    const count = await countriesCollection.countDocuments();
+    if (count === 0) {
+      await countriesCollection.insertMany(countries);
+    }
+
+    app.get('/countries', async (req, res) => {
+      const allCountries = await countriesCollection.find().toArray();
+      res.send(allCountries);
+    });
 
     app.post('/my-spots', async (req, res) => {
       const { email } = req.body;
@@ -37,10 +81,10 @@ async function run() {
     });
 
     app.post('/spots-by-country', async (req, res) => {
-      const { countryName } = req.body;
-      const query = { countryName };
-      const touristSpot = await touristSpotCollection.find(query).toArray();
-      res.send(touristSpot);
+      const { country_Name } = req.body;
+      const query = { countryName: country_Name };
+      const touristSpots = await touristSpotCollection.find(query).toArray();
+      res.send(touristSpots);
     });
 
     app.get('/tourist-spot/:id', async (req, res) => {
