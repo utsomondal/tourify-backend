@@ -8,7 +8,8 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 // Middleware
-app.use(cors({origin: 'http://localhost:5173'}));
+app.use(cors());
+
 app.use(express.json());
 
 // Connect mongodb
@@ -146,9 +147,9 @@ async function run() {
 run().catch(console.dir);
 
 app.get('/', (req, res) => {
-    res.send('Tourify server is running')
+  res.send('Tourify server is running')
 })
 
 app.listen(port, () => {
-    console.log(`Tourify Server is running on port: ${port}`)
+  console.log(`Tourify Server is running on port: ${port}`)
 })
